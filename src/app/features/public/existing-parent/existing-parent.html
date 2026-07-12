@@ -1,0 +1,88 @@
+<div class="form-container">
+
+    <h1>Existing Parent Appointment</h1>
+
+    <form
+        [formGroup]="appointmentForm"
+        (ngSubmit)="submit()">
+
+        <input
+            type="text"
+            placeholder="Parent Name"
+            formControlName="name">
+
+        <input
+            type="text"
+            placeholder="Mobile Number"
+            formControlName="mobile">
+
+        <input
+            type="email"
+            placeholder="Email"
+            formControlName="email">
+
+        <input
+            type="text"
+            placeholder="Student Name"
+            formControlName="studentName">
+
+        <input
+            type="text"
+            placeholder="Class"
+            formControlName="studentClass">
+
+        <input
+            type="text"
+            placeholder="Section"
+            formControlName="section">
+
+        <select formControlName="purpose">
+
+            <option value="">Select Purpose</option>
+
+            <option>Academic Discussion</option>
+
+            <option>Fee Discussion</option>
+
+            <option>Transport</option>
+
+            <option>Meet Principal</option>
+
+        </select>
+
+        <input
+            type="date"
+            formControlName="appointmentDate"
+            (change)="loadSlots()">
+
+        <select formControlName="slot">
+
+    <option value="">
+        Select Time Slot
+    </option>
+
+    @for (slot of slots; track slot._id) {
+
+        <option [value]="slot._id">
+            {{ slot.startTime }} - {{ slot.endTime }}
+        </option>
+
+    }
+
+</select>
+
+        <textarea
+            rows="4"
+            placeholder="Remarks"
+            formControlName="remarks">
+        </textarea>
+
+        <button type="submit">
+
+            Submit Appointment
+
+        </button>
+
+    </form>
+
+</div>

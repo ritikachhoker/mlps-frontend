@@ -1,0 +1,160 @@
+.container{
+
+    padding:35px;
+
+}
+
+.top-bar{
+
+    display:grid;
+
+    grid-template-columns:2fr 1fr 1fr 1fr;
+
+    gap:15px;
+
+    margin:25px 0;
+
+}
+
+.top-bar input,
+.top-bar select{
+
+    height:45px;
+
+    border:1px solid #ddd;
+
+    border-radius:10px;
+
+    padding:0 15px;
+
+    background:white;
+
+}
+
+.table-card{
+
+    background:white;
+
+    border-radius:16px;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+
+    overflow:hidden;
+
+}
+
+.table-card h3{
+
+    padding:20px;
+
+    margin:0;
+
+}
+
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+thead{
+
+    background:#1F4FA3;
+
+    color:white;
+
+}
+
+th{
+
+    padding:18px;
+
+    font-weight:600;
+
+}
+
+td{
+
+    padding:18px;
+
+    border-bottom:1px solid #eee;
+
+}
+
+tbody tr:hover{
+
+    background:#f8fbff;
+
+}
+
+.badge{
+
+    padding:6px 14px;
+
+    border-radius:20px;
+
+    font-size:13px;
+
+    font-weight:600;
+
+}
+
+.pending{
+
+    background:#FFF3CD;
+
+    color:#C88700;
+
+}
+
+.approved{
+
+    background:#DCFCE7;
+
+    color:#16A34A;
+
+}
+
+.rejected{
+
+    background:#FEE2E2;
+
+    color:#DC2626;
+
+}
+
+.approve{
+
+    background:#16A34A;
+
+    color:white;
+
+    border:none;
+
+    border-radius:8px;
+
+    padding:8px 15px;
+
+    cursor:pointer;
+
+    margin-right:8px;
+
+}
+
+.reject{
+
+    background:#DC2626;
+
+    color:white;
+
+    border:none;
+
+    border-radius:8px;
+
+    padding:8px 15px;
+
+    cursor:pointer;
+
+}

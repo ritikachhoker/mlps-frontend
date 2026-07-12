@@ -1,0 +1,68 @@
+<div class="form-container">
+
+    <h1>Vendor Appointment</h1>
+
+    <form
+        [formGroup]="vendorForm"
+        (ngSubmit)="submit()">
+
+        <input
+            type="text"
+            placeholder="Name"
+            formControlName="name">
+
+        <input
+            type="text"
+            placeholder="Mobile"
+            formControlName="mobile">
+
+        <input
+            type="email"
+            placeholder="Email"
+            formControlName="email">
+
+        <input
+            type="text"
+            placeholder="Organization Name"
+            formControlName="organizationName">
+
+        <input
+            type="text"
+            placeholder="Purpose"
+            formControlName="purpose">
+
+        <input
+            type="date"
+            formControlName="appointmentDate"
+            (change)="loadSlots()">
+
+        <select formControlName="slot">
+
+            <option value="">Select Slot</option>
+
+            @for(slot of slots; track slot._id){
+
+                <option [value]="slot._id">
+
+                    {{slot.startTime}} - {{slot.endTime}}
+
+                </option>
+
+            }
+
+        </select>
+
+        <textarea
+            formControlName="remarks"
+            placeholder="Remarks">
+        </textarea>
+
+        <button type="submit">
+
+            Submit Appointment
+
+        </button>
+
+    </form>
+
+</div>

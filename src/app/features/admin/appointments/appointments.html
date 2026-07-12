@@ -1,0 +1,133 @@
+<div class="container">
+
+    <h1>Appointment Management</h1>
+
+    <div class="top-bar">
+
+        <input
+            type="text"
+            [(ngModel)]="search"
+            (input)="filterAppointments()"
+            placeholder="Search by Name / Phone / Email">
+
+        <input
+            type="date"
+            [(ngModel)]="fromDate"
+            (change)="filterAppointments()">
+
+        <input
+            type="date"
+            [(ngModel)]="toDate"
+            (change)="filterAppointments()">
+
+        <select
+            [(ngModel)]="status"
+            (change)="filterAppointments()">
+
+            <option value="ALL">All</option>
+            <option value="PENDING">Pending</option>
+            <option value="APPROVED">Approved</option>
+            <option value="REJECTED">Rejected</option>
+
+        </select>
+
+    </div>
+
+    <div class="table-card">
+
+        <h3>Recent Appointments</h3>
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>ID</th>
+                    <th>Visitor</th>
+                    <th>Name</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                @for (appointment of filteredAppointments; track appointment._id) {
+
+                <tr>
+
+                    <td>{{ appointment.bookingId }}</td>
+
+                    <td>{{ appointment.visitorType }}</td>
+
+                    <td>{{ appointment.name }}</td>
+
+                    <td>{{ appointment.appointmentDate | date:'dd MMM yyyy' }}</td>
+
+                    <td>
+                        {{ appointment.slot?.startTime }} -
+                        {{ appointment.slot?.endTime }}
+                    </td>
+
+                    <td>
+
+                        <span
+                            class="badge"
+                            [class.pending]="appointment.status === 'PENDING'"
+                            [class.approved]="appointment.status === 'APPROVED'"
+                            [class.rejected]="appointment.status === 'REJECTED'">
+
+                            {{ appointment.status }}
+
+                        </span>
+
+                    </td>
+
+                    <td>
+
+                        @if (appointment.status === 'PENDING') {
+
+                            <button
+                                class="approve"
+                                (click)="approve(appointment._id)">
+                                Approve
+                            </button>
+
+                            <button
+                                class="reject"
+                                (click)="reject(appointment._id)">
+                                Reject
+                            </button>
+
+                        } @else {
+
+                            👁️
+
+                        }
+
+                    </td>
+
+                </tr>
+
+                }
+
+                @if(filteredAppointments.length === 0){
+
+                <tr>
+                    <td colspan="7" style="text-align:center;padding:20px;">
+                        No appointments found
+                    </td>
+                </tr>
+
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>

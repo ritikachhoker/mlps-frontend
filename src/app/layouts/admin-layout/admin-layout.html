@@ -1,0 +1,54 @@
+<div class="layout">
+
+  <aside class="sidebar">
+
+    <div class="logo">
+      <img src="/logo/logo.png" alt="Logo">
+      <span>MLPS School</span>
+    </div>
+
+    <nav>
+
+      <a
+        routerLink="/admin/dashboard"
+        routerLinkActive="active">
+
+        🏠 Dashboard
+
+      </a>
+
+      <a
+        routerLink="/admin/appointments"
+        routerLinkActive="active">
+
+        📅 Appointments
+
+      </a>
+
+      <a
+        routerLink="/admin/time-slots"
+        routerLinkActive="active">
+
+        🕒 Time Slots
+
+      </a>
+
+    </nav>
+
+    <button
+      class="logout-btn"
+      (click)="logout()">
+
+      🚪 Logout
+
+    </button>
+
+  </aside>
+
+  <main class="content">
+
+    <router-outlet></router-outlet>
+
+  </main>
+
+</div>

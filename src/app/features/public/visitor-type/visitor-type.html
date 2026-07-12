@@ -1,0 +1,48 @@
+<div class="container">
+
+    <h1>Select Visitor Type</h1>
+
+    <p>
+        Choose your visitor category to continue.
+    </p>
+
+    <div class="cards">
+
+  <div
+    class="card"
+    [class.active]="selectedType==='PARENT'"
+    (click)="select('PARENT')">
+
+    <div class="icon">👨‍👩‍👧</div>
+
+    <h2>Parent</h2>
+
+    <p>Existing or New Parent</p>
+
+  </div>
+
+  <div
+    class="card"
+    [class.active]="selectedType==='VENDOR'"
+    (click)="select('VENDOR')">
+
+    <div class="icon">🏢</div>
+
+    <h2>Vendor</h2>
+
+    <p>Business Meeting</p>
+
+  </div>
+
+</div>
+
+<button
+  class="continue-btn"
+  (click)="continue()"
+  [disabled]="!selectedType">
+
+  Continue
+
+</button>
+
+</div>
