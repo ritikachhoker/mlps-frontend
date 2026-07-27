@@ -7,22 +7,22 @@
         <input
             type="text"
             [(ngModel)]="search"
-            (input)="filterAppointments()"
+            (input)="onFilterChange()"
             placeholder="Search by Booking ID / Name / Phone / Email">
 
         <input
             type="date"
             [(ngModel)]="fromDate"
-            (change)="filterAppointments()">
+            (change)="onFilterChange()">
 
-        <input
+        <!-- <input
             type="date"
             [(ngModel)]="toDate"
-            (change)="filterAppointments()">
+            (change)="onFilterChange()"> -->
 
         <select
             [(ngModel)]="status"
-            (change)="filterAppointments()">
+            (change)="onFilterChange()">
 
             <option value="ALL">All</option>
             <option value="PENDING">Pending</option>

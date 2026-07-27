@@ -20,7 +20,8 @@ export class AppointmentService {
   limit = 10,
   search = '',
   status = '',
-  date = ''
+  fromDate = '',
+  toDate = ''
 ) {
 
   let url = `${this.api}?page=${page}&limit=${limit}`;
@@ -33,8 +34,12 @@ export class AppointmentService {
     url += `&status=${status}`;
   }
 
-  if (date) {
-    url += `&date=${date}`;
+  if (fromDate) {
+    url += `&fromDate=${fromDate}`;
+  }
+
+  if (toDate) {
+    url += `&toDate=${toDate}`;
   }
 
   return this.http.get(url);

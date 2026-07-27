@@ -30,20 +30,21 @@ limit = 10;
     this.loadAppointments();
   }
 
- loadAppointments() {
+loadAppointments() {
 
   this.appointmentService.getAppointments(
-  this.currentPage,
-  this.limit,
-  this.search,
-  this.status,
-  this.fromDate
-).subscribe({
+    this.currentPage,
+    this.limit,
+    this.search,
+    this.status,
+    this.fromDate,
+    // this.toDate
+  ).subscribe({
 
     next: (response: any) => {
 
       this.appointments = response.data.appointments;
-      this.filteredAppointments = [...this.appointments];
+      this.filteredAppointments = response.data.appointments;
 
       this.currentPage = response.data.currentPage;
       this.totalPages = response.data.totalPages;
@@ -55,43 +56,11 @@ limit = 10;
   });
 
 }
-  filterAppointments() {
+  onFilterChange() {
 
-  this.filteredAppointments = this.appointments.filter((appointment: any) => {
+  this.currentPage = 1;
 
-    // Search
-    const keyword = this.search.toLowerCase();
-
-    const matchesSearch =
-      appointment.bookingId.toLowerCase().includes(keyword) ||
-      appointment.name.toLowerCase().includes(keyword) ||
-      appointment.mobile.includes(keyword) ||
-      appointment.email.toLowerCase().includes(keyword);
-
-    // Status
-    const matchesStatus =
-      this.status === 'ALL' ||
-      appointment.status === this.status;
-
-    // Date
-
-    const appointmentDate =
-      appointment.appointmentDate.substring(0,10);
-
-    const matchesFrom =
-      !this.fromDate ||
-      appointmentDate >= this.fromDate;
-
-    const matchesTo =
-      !this.toDate ||
-      appointmentDate <= this.toDate;
-
-    return matchesSearch &&
-           matchesStatus &&
-           matchesFrom &&
-           matchesTo;
-
-  });
+  this.loadAppointments();
 
 }
   approve(id: string) {
