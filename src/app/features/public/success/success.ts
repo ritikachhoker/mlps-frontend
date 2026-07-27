@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-success',
@@ -9,5 +9,19 @@ import { RouterLink } from '@angular/router';
   styleUrl: './success.css'
 })
 export class Success {
+
+  private router = inject(Router);
+
+  bookingId = '';
+  status = 'PENDING';
+
+  constructor() {
+
+    const state = history.state;
+
+    this.bookingId = state.bookingId || '';
+    this.status = state.status || 'PENDING';
+
+  }
 
 }

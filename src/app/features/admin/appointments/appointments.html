@@ -8,7 +8,7 @@
             type="text"
             [(ngModel)]="search"
             (input)="filterAppointments()"
-            placeholder="Search by Name / Phone / Email">
+            placeholder="Search by Booking ID / Name / Phone / Email">
 
         <input
             type="date"
@@ -28,6 +28,7 @@
             <option value="PENDING">Pending</option>
             <option value="APPROVED">Approved</option>
             <option value="REJECTED">Rejected</option>
+            <option value="CANCELLED">Cancelled</option>
 
         </select>
 
@@ -78,7 +79,8 @@
                             class="badge"
                             [class.pending]="appointment.status === 'PENDING'"
                             [class.approved]="appointment.status === 'APPROVED'"
-                            [class.rejected]="appointment.status === 'REJECTED'">
+                            [class.rejected]="appointment.status === 'REJECTED'"
+                            [class.cancelled]="appointment.status === 'CANCELLED'">
 
                             {{ appointment.status }}
 
@@ -104,7 +106,13 @@
 
                         } @else {
 
-                            👁️
+                            <button
+    class="view"
+    (click)="viewAppointment(appointment)">
+
+    View
+
+</button>
 
                         }
 
@@ -129,5 +137,121 @@
         </table>
 
     </div>
+    @if(selectedAppointment){
 
+<div class="popup-overlay">
+
+    <div class="popup">
+
+        <h2>Appointment Details</h2>
+
+        <p><strong>Booking ID:</strong> {{selectedAppointment.bookingId}}</p>
+
+        <p><strong>Visitor Type:</strong> {{selectedAppointment.visitorType}}</p>
+
+        <p><strong>Name:</strong> {{selectedAppointment.name}}</p>
+
+        <p><strong>Mobile:</strong> {{selectedAppointment.mobile}}</p>
+
+        <p><strong>Email:</strong> {{selectedAppointment.email}}</p>
+
+        @if(selectedAppointment.student){
+
+        <p><strong>Student:</strong>
+            {{selectedAppointment.student.name}}
+        </p>
+
+        <p><strong>Class:</strong>
+            {{selectedAppointment.student.class}}
+            {{selectedAppointment.student.section}}
+        </p>
+
+        }
+
+        @if(selectedAppointment.organizationName){
+
+        <p><strong>Organization:</strong>
+            {{selectedAppointment.organizationName}}
+        </p>
+
+        }
+
+        <p><strong>Purpose:</strong>
+            {{selectedAppointment.purpose}}
+        </p>
+
+        <p><strong>Date:</strong>
+
+            {{selectedAppointment.appointmentDate | date:'dd MMM yyyy'}}
+
+        </p>
+
+        <p><strong>Time:</strong>
+
+            {{selectedAppointment.slot?.startTime}}
+            -
+            {{selectedAppointment.slot?.endTime}}
+
+        </p>
+
+        <p><strong>Remarks:</strong>
+
+            {{selectedAppointment.remarks || '-'}}
+
+        </p>
+
+        <p><strong>Status:</strong>
+
+            {{selectedAppointment.status}}
+
+        </p>
+
+        @if(selectedAppointment.status==='CANCELLED'){
+
+        <p><strong>Cancellation Reason:</strong>
+
+            {{selectedAppointment.cancellationReason}}
+
+        </p>
+
+        }
+
+        <button
+            class="close"
+            (click)="closePopup()">
+
+            Close
+
+        </button>
+
+    </div>
+
+</div>
+
+}
+<div class="pagination">
+
+    <button
+        (click)="previousPage()"
+        [disabled]="currentPage === 1">
+
+        Previous
+
+    </button>
+
+    <span>
+
+        Page {{currentPage}} of {{totalPages}}
+
+    </span>
+
+    <button
+        (click)="nextPage()"
+        [disabled]="currentPage === totalPages">
+
+        Next
+
+    </button>
+
+</div>
 </div>

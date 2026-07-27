@@ -4,11 +4,52 @@
 
         <h2>Time Slot Management</h2>
 
-        <button class="add-btn" type="submit" (click)="saveSlot()">
-            {{ editingSlotId ? 'Update Slot' : '+ Add Time Slot' }}
-        </button>
+        <button
+    type="button"
+    class="add-btn"
+    (click)="saveSlot()">
+
+    {{ editingSlotId ? 'Update Slot' : '+ Add Time Slot' }}
+
+</button>
 
     </div>
+    <div class="toolbar">
+
+    <input
+        type="text"
+        placeholder="Search by start or end time..."
+        [(ngModel)]="searchText"
+        (input)="searchSlots()">
+
+</div>
+<div class="cards">
+
+    <div class="card">
+
+        <h3>Total Slots</h3>
+
+        <h2>{{slots.length}}</h2>
+
+    </div>
+
+    <div class="card">
+
+        <h3>Active Slots</h3>
+
+        <h2>{{activeSlots}}</h2>
+
+    </div>
+
+    <div class="card">
+
+        <h3>Inactive Slots</h3>
+
+        <h2>{{inactiveSlots}}</h2>
+
+    </div>
+
+</div>
 
     <div class="form-card">
 
@@ -71,7 +112,7 @@
 
             <tbody>
 
-                @for(slot of slots; track slot._id){
+                @for(slot of filteredSlots; track slot._id){
 
                 <tr>
 
@@ -83,18 +124,29 @@
 
                     <td>
 
-                        <label class="switch">
+                        <td>
 
-                            <input
-                                type="checkbox"
-                                [checked]="slot.isActive"
-                                (change)="toggle(slot._id)">
+    @if(slot.isActive){
 
-                            <span class="slider"></span>
+        <span class="badge active">
 
-                        </label>
+            Active
 
-                    </td>
+        </span>
+
+    }@else{
+
+        <span class="badge inactive">
+
+            Inactive
+
+        </span>
+
+    }
+
+</td>
+
+                    
 
                     <td>
 
@@ -103,18 +155,26 @@
     <button
         class="icon-btn edit"
         (click)="editSlot(slot)"
-        title="Edit">
+        title="Edit Slot">
 
-        <i class="fa-solid fa-pen"></i>
+        <i class="fa-solid fa-pen-to-square"></i>
 
     </button>
 
     <button
-        class="icon-btn delete"
-        (click)="toggle(slot._id)"
-        title="Delete">
+        class="icon-btn toggle"
+        (click)="confirmToggle(slot)"
+        [title]="slot.isActive ? 'Deactivate Slot' : 'Activate Slot'">
 
-        <i class="fa-solid fa-trash"></i>
+        @if(slot.isActive){
+
+            <i class="fa-solid fa-toggle-on"></i>
+
+        }@else{
+
+            <i class="fa-solid fa-toggle-off"></i>
+
+        }
 
     </button>
 

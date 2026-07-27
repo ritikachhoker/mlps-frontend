@@ -2,11 +2,12 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { SlotService } from '../../../core/services/slot.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-time-slots',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './time-slots.html',
   styleUrl: './time-slots.css'
 
@@ -17,6 +18,15 @@ export class TimeSlots implements OnInit {
   private slotService = inject(SlotService);
    editingSlotId = '';
   slots: any[] = [];
+  filteredSlots: any[] = [];
+
+searchText = '';
+
+loading = false;
+
+activeSlots = 0;
+
+inactiveSlots = 0;
 
   slotForm = this.fb.group({
     startTime: ['', Validators.required],
@@ -43,13 +53,38 @@ export class TimeSlots implements OnInit {
 
 }
   loadSlots() {
-    this.slotService.getAllSlots().subscribe({
-      next: (response: any) => {
-        this.slots = response.data;
-      },
-      error: (err) => console.error(err)
-    });
-  }
+
+  this.loading = true;
+
+  this.slotService.getAllSlots().subscribe({
+
+    next: (response: any) => {
+
+      this.loading = false;
+
+      this.slots = response.data;
+
+      this.filteredSlots = [...this.slots];
+
+      this.activeSlots =
+        this.slots.filter(x => x.isActive).length;
+
+      this.inactiveSlots =
+        this.slots.filter(x => !x.isActive).length;
+
+    },
+
+    error: (err) => {
+
+      this.loading = false;
+
+      console.error(err);
+
+    }
+
+  });
+
+}
 
   saveSlot() {
 
@@ -61,52 +96,119 @@ export class TimeSlots implements OnInit {
 
   const value = this.slotForm.getRawValue();
 
+if (value.startTime! >= value.endTime!) {
+
+  alert("End time must be greater than Start time.");
+
+  return;
+
+}
+
   if(this.editingSlotId){
 
     this.slotService
-      .updateSlot(this.editingSlotId,value)
-      .subscribe({
+  .updateSlot(this.editingSlotId,value)
+  .subscribe({
 
-        next:()=>{
+    next:()=>{
 
-          this.slotForm.reset({
-            duration:15
-          });
+      alert("Slot updated successfully.");
 
-          this.editingSlotId='';
+      this.resetForm();
 
-          this.loadSlots();
+      this.loadSlots();
 
-        }
+    },
 
-      });
+    error:(err:any)=>{
+
+      alert(err.error?.message || "Unable to update slot.");
+
+    }
+
+  });
 
   }
 
   else{
 
     this.slotService
-      .createSlot(value)
-      .subscribe({
+  .createSlot(value)
+  .subscribe({
 
-        next:()=>{
+    next:()=>{
 
-          this.slotForm.reset({
-            duration:15
-          });
+      alert("Slot saved successfully.");
 
-          this.loadSlots();
+      this.resetForm();
 
-        }
+      this.loadSlots();
 
-      });
+    },
+
+    error:(err:any)=>{
+
+      alert(err.error?.message || "Unable to save slot.");
+
+    }
+
+  });
 
   }
 
 }
-  toggle(slotId: string) {
-    this.slotService.toggleStatus(slotId)
-      .subscribe(() => this.loadSlots());
-  }
+searchSlots() {
+
+  const keyword = this.searchText.toLowerCase();
+
+  this.filteredSlots = this.slots.filter(slot =>
+
+    slot.startTime.toLowerCase().includes(keyword) ||
+
+    slot.endTime.toLowerCase().includes(keyword)
+
+  );
+
+}
+  confirmToggle(slot: any) {
+
+  const action = slot.isActive
+
+    ? 'Deactivate'
+
+    : 'Activate';
+
+  const confirmed = confirm(
+
+    `Are you sure you want to ${action} this slot?`
+
+  );
+
+  if (!confirmed) return;
+
+  this.slotService
+
+    .toggleStatus(slot._id)
+
+    .subscribe({
+
+      next: () => {
+
+        this.loadSlots();
+
+      }
+
+    });
+
+}
+resetForm() {
+
+  this.slotForm.reset({
+    duration: 15
+  });
+
+  this.editingSlotId = '';
+
+}
 
 }

@@ -17,24 +17,36 @@ export class Appointments implements OnInit {
 
   appointments: any[] = [];
 filteredAppointments: any[] = [];
+selectedAppointment: any = null;
 
 search = '';
 status = 'ALL';
 fromDate = '';
 toDate = '';
+currentPage = 1;
+totalPages = 1;
+limit = 10;
   ngOnInit(): void {
     this.loadAppointments();
   }
 
  loadAppointments() {
 
-  this.appointmentService.getAppointments().subscribe({
+  this.appointmentService.getAppointments(
+  this.currentPage,
+  this.limit,
+  this.search,
+  this.status,
+  this.fromDate
+).subscribe({
 
     next: (response: any) => {
 
       this.appointments = response.data.appointments;
-
       this.filteredAppointments = [...this.appointments];
+
+      this.currentPage = response.data.currentPage;
+      this.totalPages = response.data.totalPages;
 
     },
 
@@ -51,6 +63,7 @@ toDate = '';
     const keyword = this.search.toLowerCase();
 
     const matchesSearch =
+      appointment.bookingId.toLowerCase().includes(keyword) ||
       appointment.name.toLowerCase().includes(keyword) ||
       appointment.mobile.includes(keyword) ||
       appointment.email.toLowerCase().includes(keyword);
@@ -102,5 +115,39 @@ toDate = '';
       });
 
   }
+  previousPage() {
+
+  if (this.currentPage > 1) {
+
+    this.currentPage--;
+
+    this.loadAppointments();
+
+  }
+
+}
+
+nextPage() {
+
+  if (this.currentPage < this.totalPages) {
+
+    this.currentPage++;
+
+    this.loadAppointments();
+
+  }
+
+}
+viewAppointment(appointment: any) {
+
+  this.selectedAppointment = appointment;
+
+}
+
+closePopup() {
+
+  this.selectedAppointment = null;
+
+}
 
 }

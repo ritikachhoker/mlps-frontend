@@ -2,10 +2,11 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DashboardService } from '../../../core/services/dashboard.service';
 import { AppointmentService } from '../../../core/services/appointment.service';
+import { FormsModule } from '@angular/forms'
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule,FormsModule],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })
@@ -16,54 +17,89 @@ export class Dashboard implements OnInit {
 
 recentAppointments: any[] = [];
   dashboard: any = {};
+  loading = true;
+  search = '';
+status = 'ALL';
+selectedDate = '';
+
+allRecentAppointments: any[] = [];
 
   ngOnInit(): void {
     this.loadDashboard();
-     this.loadDashboard();
 
-  this.loadRecentAppointments();
+  // this.loadRecentAppointments();
   }
-  loadRecentAppointments() {
+ loadRecentAppointments() {
 
-  this.appointmentService.getAppointments().subscribe({
+  this.appointmentService.getAppointments(1, 5).subscribe({
 
     next: (response: any) => {
 
-      this.recentAppointments = response.data.appointments;
+  this.allRecentAppointments = response.data.appointments;
+  this.recentAppointments = [...this.allRecentAppointments];
 
-    },
+},
 
-    error: console.error
+    error: (err) => {
+
+      console.error(err);
+
+    }
 
   });
 
 }
   loadDashboard() {
 
-    this.dashboardService.getDashboard().subscribe({
+  this.loading = true;
 
-      // next: (response: any) => {
+  this.dashboardService.getDashboard().subscribe({
 
-      //   this.dashboard = response.data;
+    next: (response: any) => {
 
-      // },
-      next: (response: any) => {
+      this.dashboard = response.data;
 
-  console.log(response);
-  console.log(response.data);
+      // Load appointments after dashboard is ready
+      this.loadRecentAppointments();
 
-  this.dashboard = response.data;
+      this.loading = false;
 
-       },
+    },
 
-      error: (err) => {
+    error: (err) => {
 
-        console.error(err);
+      console.error('Dashboard Error:', err);
 
-      }
+      this.loading = false;
 
-    });
+    }
 
-  }
+  });
 
+}
+filterAppointments() {
+
+  this.recentAppointments = this.allRecentAppointments.filter((appointment: any) => {
+
+    const keyword = this.search.toLowerCase();
+
+    const matchesSearch =
+      appointment.name.toLowerCase().includes(keyword) ||
+      appointment.mobile.includes(keyword) ||
+      appointment.email.toLowerCase().includes(keyword) ||
+      appointment.bookingId.toLowerCase().includes(keyword);
+
+    const matchesStatus =
+      this.status === 'ALL' ||
+      appointment.status === this.status;
+
+    const matchesDate =
+      !this.selectedDate ||
+      appointment.appointmentDate.substring(0, 10) === this.selectedDate;
+
+    return matchesSearch && matchesStatus && matchesDate;
+
+  });
+
+}
 }

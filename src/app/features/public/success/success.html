@@ -16,7 +16,7 @@
 
         <p>
 
-            Your appointment request has been sent successfully.
+            Your appointment request has been submitted successfully.
 
         </p>
 
@@ -26,18 +26,53 @@
 
         </p>
 
-        <div class="status">
+        @if(bookingId){
 
-            Status :
-            <span>Pending</span>
+        <div class="info-box">
+
+            <label>Booking ID</label>
+
+            <div class="value">
+
+                {{bookingId}}
+
+            </div>
 
         </div>
 
-        <button routerLink="/">
+        }
 
-            Back to Home
+        <div class="info-box">
 
-        </button>
+            <label>Status</label>
+
+            <div class="value pending">
+
+                {{status}}
+
+            </div>
+
+        </div>
+
+        <div class="buttons">
+
+            <button
+                class="primary"
+                routerLink="/visitor-type">
+
+                Book Another Appointment
+
+            </button>
+
+            <button
+                class="secondary"
+                routerLink="/">
+
+                Go To Home
+
+            </button>
+
+        </div>
 
     </div>
 

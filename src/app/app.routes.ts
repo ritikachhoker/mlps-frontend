@@ -52,6 +52,18 @@ export const routes: Routes = [
       import('./features/public/success/success')
         .then(m => m.Success)
   },
+  {
+  path: 'cancel-appointment',
+  loadComponent: () =>
+    import('./features/public/cancel-appointment/cancel-appointment')
+      .then(m => m.CancelAppointment)
+},
+{
+  path: 'reschedule-appointment',
+  loadComponent: () =>
+    import('./features/public/reschedule-appointment/reschedule-appointment')
+      .then(m => m.RescheduleAppointment)
+},
 
   // Admin Routes
   // Admin Login (Public)

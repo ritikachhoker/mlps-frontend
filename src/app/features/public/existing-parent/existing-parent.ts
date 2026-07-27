@@ -143,8 +143,14 @@ export class ExistingParent implements OnInit {
   console.log(response);
 
   this.appointmentForm.reset();
+this.slots = [];
 
-  this.router.navigate(['/success']);
+  this.router.navigate(['/success'], {
+  state: {
+    bookingId: response.data.bookingId,
+    status: response.data.status
+  }
+});
 
 },
 

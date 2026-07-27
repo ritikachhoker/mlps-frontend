@@ -1,0 +1,124 @@
+<div class="reschedule-container">
+
+    <div class="reschedule-card">
+
+        <h2>Reschedule Appointment</h2>
+
+        <form
+            [formGroup]="rescheduleForm"
+            (ngSubmit)="submit()">
+
+            <!-- Booking ID -->
+
+            <div class="form-group">
+
+                <label>Booking ID</label>
+
+                <input
+                    type="text"
+                    formControlName="bookingId"
+                    placeholder="Enter Booking ID">
+
+            </div>
+
+            <!-- Mobile -->
+
+            <div class="form-group">
+
+                <label>Mobile Number</label>
+
+                <input
+                    type="text"
+                    formControlName="mobile"
+                    placeholder="Enter Mobile Number">
+
+            </div>
+
+            <!-- Date -->
+
+            <div class="form-group">
+
+                <label>Select New Date</label>
+
+                <input
+                    type="date"
+                    formControlName="newDate"
+                    (change)="onDateChange($event)">
+
+            </div>
+
+            <!-- Slot -->
+
+            <div class="form-group">
+
+                <label>Select New Slot</label>
+
+                <select formControlName="newSlotId">
+
+                    <option value="">
+                        Select Slot
+                    </option>
+
+                    @for(slot of slots; track slot._id){
+
+                        <option [value]="slot._id">
+
+                            {{slot.startTime}} - {{slot.endTime}}
+
+                        </option>
+
+                    }
+
+                </select>
+
+            </div>
+
+            @if(loading){
+
+                <p class="loading">
+                    Loading available slots...
+                </p>
+
+            }
+
+            <button
+                type="submit"
+                [disabled]="loading">
+
+                @if(loading){
+
+                    Rescheduling...
+
+                } @else {
+
+                    Reschedule Appointment
+
+                }
+
+            </button>
+
+        </form>
+
+        @if(successMessage){
+
+            <div class="success">
+
+                {{successMessage}}
+
+            </div>
+
+        }
+
+        @if(errorMessage){
+
+            <div class="error">
+
+                {{errorMessage}}
+
+            </div>
+
+        }
+
+    </div>
+
+</div>

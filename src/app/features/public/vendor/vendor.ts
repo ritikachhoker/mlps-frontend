@@ -66,55 +66,57 @@ export class Vendor {
 
   submit() {
 
-    if (this.vendorForm.invalid) {
+  if (this.vendorForm.invalid) {
 
-      this.vendorForm.markAllAsTouched();
+    this.vendorForm.markAllAsTouched();
 
-      return;
-
-    }
-
-    const value = this.vendorForm.getRawValue();
-
-    const payload = {
-
-      name: value.name,
-
-      visitorType: 'VENDOR',
-
-      mobile: value.mobile,
-
-      email: value.email,
-
-      organizationName: value.organizationName,
-
-      purpose: value.purpose,
-
-      appointmentDate: value.appointmentDate,
-
-      slot: value.slot,
-
-      remarks: value.remarks
-
-    };
-
-    this.appointmentService.createAppointment(payload)
-      .subscribe({
-
-        next: () => {
-
-          this.router.navigate(['/success']);
-
-        },
-
-        error: err => {
-
-          console.error(err);
-
-        }
-
-      });
+    return;
 
   }
+
+  const value = this.vendorForm.getRawValue();
+
+  const payload = {
+
+    name: value.name,
+    visitorType: 'VENDOR',
+    mobile: value.mobile,
+    email: value.email,
+    organizationName: value.organizationName,
+    purpose: value.purpose,
+    appointmentDate: value.appointmentDate,
+    slot: value.slot,
+    remarks: value.remarks
+
+  };
+
+  this.appointmentService.createAppointment(payload)
+    .subscribe({
+
+      next: (response: any) => {
+
+        this.vendorForm.reset();
+        this.slots = [];
+
+        this.router.navigate(['/success'], {
+          state: {
+            bookingId: response.data.bookingId,
+            status: response.data.status
+          }
+        });
+
+      },
+
+      error: (error) => {
+
+        console.error(error);
+
+        alert(error.error?.message || 'Appointment could not be created.');
+
+      }
+
+    });
+
+}
 
 }

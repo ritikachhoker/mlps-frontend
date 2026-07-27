@@ -1,0 +1,57 @@
+<div class="cancel-container">
+
+    <div class="cancel-card">
+
+        <h2>Cancel Appointment</h2>
+
+        <form
+            [formGroup]="cancelForm"
+            (ngSubmit)="submit()">
+
+            <input
+                type="text"
+                placeholder="Booking ID"
+                formControlName="bookingId">
+
+            <input
+                type="text"
+                placeholder="Mobile Number"
+                formControlName="mobile">
+
+            <textarea
+                rows="4"
+                placeholder="Reason for Cancellation"
+                formControlName="cancellationReason">
+            </textarea>
+
+            <button type="submit">
+
+                Cancel Appointment
+
+            </button>
+
+        </form>
+
+        @if(successMessage){
+
+        <p class="success">
+
+            {{successMessage}}
+
+        </p>
+
+        }
+
+        @if(errorMessage){
+
+        <p class="error">
+
+            {{errorMessage}}
+
+        </p>
+
+        }
+
+    </div>
+
+</div>
