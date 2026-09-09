@@ -5,55 +5,91 @@
         <h2>Time Slot Management</h2>
 
         <button
-    type="button"
-    class="add-btn"
-    (click)="saveSlot()">
+            type="button"
+            class="add-btn"
+            (click)="saveSlot()">
 
-    {{ editingSlotId ? 'Update Slot' : '+ Add Time Slot' }}
+            {{ editingSlotId ? 'Update Slot' : '+ Add Time Slot' }}
 
-</button>
+        </button>
 
     </div>
+
     <div class="toolbar">
 
-    <input
-        type="text"
-        placeholder="Search by start or end time..."
-        [(ngModel)]="searchText"
-        (input)="searchSlots()">
-
-</div>
-<div class="cards">
-
-    <div class="card">
-
-        <h3>Total Slots</h3>
-
-        <h2>{{slots.length}}</h2>
+        <input
+            type="text"
+            placeholder="Search by start or end time..."
+            [(ngModel)]="searchText"
+            (input)="searchSlots()">
 
     </div>
 
-    <div class="card">
+    <div class="cards">
 
-        <h3>Active Slots</h3>
+        <div class="card">
 
-        <h2>{{activeSlots}}</h2>
+            <h3>Total Slots</h3>
+
+            <h2>{{ slots.length }}</h2>
+
+        </div>
+
+        <div class="card">
+
+            <h3>Active Slots</h3>
+
+            <h2>{{ activeSlots }}</h2>
+
+        </div>
+
+        <div class="card">
+
+            <h3>Inactive Slots</h3>
+
+            <h2>{{ inactiveSlots }}</h2>
+
+        </div>
 
     </div>
-
-    <div class="card">
-
-        <h3>Inactive Slots</h3>
-
-        <h2>{{inactiveSlots}}</h2>
-
-    </div>
-
-</div>
 
     <div class="form-card">
 
         <form [formGroup]="slotForm">
+
+            <div class="field">
+
+                <label>Select Dates</label>
+
+                <input
+                    type="date"
+                    (change)="onDateChange($event)">
+
+                @if(selectedDates.length > 0){
+
+                    <div class="selected-dates">
+
+                        @for(date of selectedDates; track date){
+
+                            <span class="date-tag">
+
+                                {{ date }}
+
+                                <button
+                                    type="button"
+                                    (click)="removeDate(date)">
+                                    ×
+                                </button>
+
+                            </span>
+
+                        }
+
+                    </div>
+
+                }
+
+            </div>
 
             <div class="field">
 
@@ -62,16 +98,15 @@
                 <input
                     type="time"
                     formControlName="startTime">
+                <div class="field">
 
-            </div>
+    <label>End Time</label>
 
-            <div class="field">
+    <input
+        type="time"
+        formControlName="endTime">
 
-                <label>End Time</label>
-
-                <input
-                    type="time"
-                    formControlName="endTime">
+</div>
 
             </div>
 
@@ -81,12 +116,19 @@
 
                 <select formControlName="duration">
 
-                    <option [value]="15">15 Minutes</option>
-                    <option [value]="20">20 Minutes</option>
+                    <option [value]="15">
+                        15 Minutes
+                    </option>
+
+                    <option [value]="20">
+                        20 Minutes
+                    </option>
 
                 </select>
 
             </div>
+
+            
 
         </form>
 
@@ -94,100 +136,122 @@
 
     <div class="table-card">
 
-        <table>
+        @if(loading){
 
-            <thead>
+            <div class="loading">
+                Loading slots...
+            </div>
 
-                <tr>
+        } @else if(filteredSlots.length === 0){
 
-                    <th>Start Time</th>
-                    <th>End Time</th>
-                    <th>Duration</th>
-                    <th>Status</th>
-                    <th>Action</th>
+            <div class="empty">
+                No slots found.
+            </div>
 
-                </tr>
+        } @else {
 
-            </thead>
+            <table>
 
-            <tbody>
+                <thead>
 
-                @for(slot of filteredSlots; track slot._id){
+                    <tr>
 
-                <tr>
+                        <th>Date</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Duration</th>
+                        <th>Status</th>
+                        <th>Action</th>
 
-                    <td>{{slot.startTime}}</td>
+                    </tr>
 
-                    <td>{{slot.endTime}}</td>
+                </thead>
 
-                    <td>{{slot.duration}} mins</td>
+                <tbody>
 
-                    <td>
+                    @for(slot of filteredSlots; track slot._id){
 
-                        <td>
+                        <tr>
 
-    @if(slot.isActive){
+                            <td>
+                                {{ slot.date | date:'dd MMM yyyy' }}
+                            </td>
 
-        <span class="badge active">
+                            <td>
+                                {{ slot.startTime }}
+                            </td>
 
-            Active
+                            <td>
+                                {{ slot.endTime }}
+                            </td>
 
-        </span>
+                            <td>
+                                {{ slot.duration }} mins
+                            </td>
 
-    }@else{
+                            <td>
 
-        <span class="badge inactive">
+                                @if(slot.isActive){
 
-            Inactive
+                                    <span class="badge active">
+                                        Active
+                                    </span>
 
-        </span>
+                                } @else {
 
-    }
+                                    <span class="badge inactive">
+                                        Inactive
+                                    </span>
 
-</td>
+                                }
 
-                    
+                            </td>
 
-                    <td>
+                            <td>
 
-                        <div class="actions">
+                                <div class="actions">
 
-    <button
-        class="icon-btn edit"
-        (click)="editSlot(slot)"
-        title="Edit Slot">
+                                    <button
+                                        type="button"
+                                        class="icon-btn edit"
+                                        (click)="editSlot(slot)"
+                                        title="Edit Slot">
 
-        <i class="fa-solid fa-pen-to-square"></i>
+                                        <i class="fa-solid fa-pen-to-square"></i>
 
-    </button>
+                                    </button>
 
-    <button
-        class="icon-btn toggle"
-        (click)="confirmToggle(slot)"
-        [title]="slot.isActive ? 'Deactivate Slot' : 'Activate Slot'">
+                                    <button
+                                        type="button"
+                                        class="icon-btn toggle"
+                                        (click)="confirmToggle(slot)"
+                                        [title]="slot.isActive ? 'Deactivate Slot' : 'Activate Slot'">
 
-        @if(slot.isActive){
+                                        @if(slot.isActive){
 
-            <i class="fa-solid fa-toggle-on"></i>
+                                            <i class="fa-solid fa-toggle-on"></i>
 
-        }@else{
+                                        } @else {
 
-            <i class="fa-solid fa-toggle-off"></i>
+                                            <i class="fa-solid fa-toggle-off"></i>
+
+                                        }
+
+                                    </button>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    }
+
+                </tbody>
+
+            </table>
 
         }
-
-    </button>
-
-</div>
-                    </td>
-
-                </tr>
-
-                }
-
-            </tbody>
-
-        </table>
 
     </div>
 

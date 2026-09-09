@@ -11,24 +11,60 @@ export class SlotService {
 
   private api = `${environment.apiUrl}/slots`;
 
+
+  // Get all slots
   getAllSlots() {
     return this.http.get(this.api);
   }
 
+
+  // Get available slots for selected date
   getAvailableSlots(date: string) {
-    return this.http.get(`${this.api}/available?date=${date}`);
+    return this.http.get(
+      `${this.api}/available?date=${date}`
+    );
   }
 
-  createSlot(data: any) {
-    return this.http.post(this.api, data);
+
+  // Create slots for selected dates
+  createSlot(data: {
+    dates: string[];
+    startTime: string;
+    endTime: string;
+    duration: number;
+  }) {
+
+    return this.http.post(
+      this.api,
+      data
+    );
   }
 
-  updateSlot(id: string, data: any) {
-    return this.http.put(`${this.api}/${id}`, data);
+
+  // Update existing slot
+  updateSlot(
+    id: string,
+    data: {
+      date: string;
+      startTime: string;
+      duration: number;
+    }
+  ) {
+
+    return this.http.put(
+      `${this.api}/${id}`,
+      data
+    );
   }
 
+
+  // Activate / Deactivate slot
   toggleStatus(id: string) {
-    return this.http.patch(`${this.api}/${id}/toggle-status`, {});
+
+    return this.http.patch(
+      `${this.api}/${id}/toggle-status`,
+      {}
+    );
   }
 
 }
