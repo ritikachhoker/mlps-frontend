@@ -1,18 +1,19 @@
 <div class="container">
 
     <div class="header">
-
-        <h2>Time Slot Management</h2>
+        <div>
+            <h2>Time Slot Management</h2>
+            <p class="subtitle">Manage your appointment availability</p>
+        </div>
 
         <button
             type="button"
             class="add-btn"
             (click)="saveSlot()">
 
-            {{ editingSlotId ? 'Update Slot' : '+ Add Time Slot' }}
+            {{ editingSlotId ? 'Update Slot' : '+ Create Slots' }}
 
         </button>
-
     </div>
 
     <div class="toolbar">
@@ -28,26 +29,214 @@
     <div class="cards">
 
         <div class="card">
+            <div>
+                <h3>Total Slots</h3>
+                <h2>{{ slots.length }}</h2>
+            </div>
 
-            <h3>Total Slots</h3>
-
-            <h2>{{ slots.length }}</h2>
-
+            <div class="card-icon">
+                <i class="fa-regular fa-calendar"></i>
+            </div>
         </div>
 
         <div class="card">
+            <div>
+                <h3>Active Slots</h3>
+                <h2>{{ activeSlots }}</h2>
+            </div>
 
-            <h3>Active Slots</h3>
-
-            <h2>{{ activeSlots }}</h2>
-
+            <div class="card-icon">
+                <i class="fa-regular fa-circle-check"></i>
+            </div>
         </div>
 
         <div class="card">
+            <div>
+                <h3>Inactive Slots</h3>
+                <h2>{{ inactiveSlots }}</h2>
+            </div>
 
-            <h3>Inactive Slots</h3>
+            <div class="card-icon">
+                <i class="fa-regular fa-circle-xmark"></i>
+            </div>
+        </div>
 
-            <h2>{{ inactiveSlots }}</h2>
+    </div>
+
+    <div class="availability-card">
+
+        <div class="calendar-section">
+
+            <div class="calendar-header">
+
+                <div>
+                    <h3>
+                        {{ monthNames[currentMonth] }}
+                        {{ currentYear }}
+                    </h3>
+
+                    <span>
+                        Select the dates for your availability
+                    </span>
+                </div>
+
+                <div class="calendar-actions">
+
+                    <button
+                        type="button"
+                        class="today-btn"
+                        (click)="goToToday()">
+                        Today
+                    </button>
+
+                    <button
+                        type="button"
+                        class="nav-btn"
+                        (click)="previousMonth()"
+                        aria-label="Previous month">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+
+                    <button
+                        type="button"
+                        class="nav-btn"
+                        (click)="nextMonth()"
+                        aria-label="Next month">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+
+                </div>
+
+            </div>
+
+            <div class="calendar">
+
+                <div class="weekdays">
+
+                    @for(day of weekDays; track day){
+
+                        <div class="weekday">
+                            {{ day }}
+                        </div>
+
+                    }
+
+                </div>
+
+                <div class="calendar-grid">
+
+                    @for(day of calendarDays; track day.dateString){
+
+                        <button
+                            type="button"
+                            class="calendar-day"
+                            [class.other-month]="!day.isCurrentMonth"
+                            [class.today]="day.isToday"
+                            [class.selected]="isDateSelected(day.dateString)"
+                            [disabled]="!day.isCurrentMonth || editingSlotId"
+                            (click)="selectDate(day.dateString, day.isCurrentMonth)">
+
+                            <span class="day-number">
+                                {{ day.date.getDate() }}
+                            </span>
+
+                            @if(isDateSelected(day.dateString)){
+
+                                <span class="selected-mark">
+                                    <i class="fa-solid fa-check"></i>
+                                </span>
+
+                            }
+
+                        </button>
+
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="selection-section">
+
+            <div class="selection-header">
+
+                <div>
+                    <h3>Selected Dates</h3>
+
+                    <span>
+                        {{ selectedDates.length }}
+                        {{ selectedDates.length === 1 ? 'date' : 'dates' }} selected
+                    </span>
+                </div>
+
+                @if(selectedDates.length > 0){
+
+                    <button
+                        type="button"
+                        class="clear-btn"
+                        (click)="clearSelectedDates()">
+                        Clear all
+                    </button>
+
+                }
+
+            </div>
+
+            @if(selectedDates.length === 0){
+
+                <div class="no-date">
+
+                    <div class="no-date-icon">
+                        <i class="fa-regular fa-calendar"></i>
+                    </div>
+
+                    <h4>No dates selected</h4>
+
+                    <p>
+                        Select one or more dates from the calendar.
+                    </p>
+
+                </div>
+
+            } @else {
+
+                <div class="selected-dates">
+
+                    @for(date of selectedDates; track date){
+
+                        <div class="date-item">
+
+                            <div class="date-info">
+
+                                <div class="date-icon">
+                                    <i class="fa-regular fa-calendar"></i>
+                                </div>
+
+                                <span>
+                                    {{ formatSelectedDate(date) }}
+                                </span>
+
+                            </div>
+
+                            <button
+                                type="button"
+                                class="remove-date"
+                                (click)="removeDate(date)"
+                                aria-label="Remove date">
+
+                                <i class="fa-solid fa-xmark"></i>
+
+                            </button>
+
+                        </div>
+
+                    }
+
+                </div>
+
+            }
 
         </div>
 
@@ -55,64 +244,60 @@
 
     <div class="form-card">
 
+        <div class="form-heading">
+
+            <div>
+                <h3>Availability</h3>
+                <p>
+                    Choose the free time range and slot duration.
+                </p>
+            </div>
+
+        </div>
+
         <form [formGroup]="slotForm">
 
             <div class="field">
 
-                <label>Select Dates</label>
+                <label>
+                    Start Time
+                </label>
 
-                <input
-                    type="date"
-                    (change)="onDateChange($event)">
+                <div class="input-wrapper">
 
-                @if(selectedDates.length > 0){
+                    <i class="fa-regular fa-clock"></i>
 
-                    <div class="selected-dates">
+                    <input
+                        type="time"
+                        formControlName="startTime">
 
-                        @for(date of selectedDates; track date){
-
-                            <span class="date-tag">
-
-                                {{ date }}
-
-                                <button
-                                    type="button"
-                                    (click)="removeDate(date)">
-                                    ×
-                                </button>
-
-                            </span>
-
-                        }
-
-                    </div>
-
-                }
+                </div>
 
             </div>
 
             <div class="field">
 
-                <label>Start Time</label>
+                <label>
+                    End Time
+                </label>
 
-                <input
-                    type="time"
-                    formControlName="startTime">
-                <div class="field">
+                <div class="input-wrapper">
 
-    <label>End Time</label>
+                    <i class="fa-regular fa-clock"></i>
 
-    <input
-        type="time"
-        formControlName="endTime">
+                    <input
+                        type="time"
+                        formControlName="endTime">
 
-</div>
+                </div>
 
             </div>
 
             <div class="field">
 
-                <label>Duration</label>
+                <label>
+                    Slot Duration
+                </label>
 
                 <select formControlName="duration">
 
@@ -128,7 +313,16 @@
 
             </div>
 
-            
+            <div class="form-info">
+
+                <i class="fa-solid fa-circle-info"></i>
+
+                <span>
+                    Individual slots will be generated automatically
+                    within the selected time range.
+                </span>
+
+            </div>
 
         </form>
 
@@ -136,120 +330,154 @@
 
     <div class="table-card">
 
+        <div class="table-header">
+
+            <div>
+                <h3>Generated Time Slots</h3>
+                <span>
+                    All appointment slots
+                </span>
+            </div>
+
+        </div>
+
         @if(loading){
 
             <div class="loading">
+                <i class="fa-solid fa-spinner fa-spin"></i>
                 Loading slots...
             </div>
 
         } @else if(filteredSlots.length === 0){
 
             <div class="empty">
-                No slots found.
+
+                <div class="empty-icon">
+                    <i class="fa-regular fa-calendar-xmark"></i>
+                </div>
+
+                <h4>No slots found</h4>
+
+                <p>
+                    Create availability to generate appointment slots.
+                </p>
+
             </div>
 
         } @else {
 
-            <table>
+            <div class="table-wrapper">
 
-                <thead>
+                <table>
 
-                    <tr>
-
-                        <th>Date</th>
-                        <th>Start Time</th>
-                        <th>End Time</th>
-                        <th>Duration</th>
-                        <th>Status</th>
-                        <th>Action</th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                    @for(slot of filteredSlots; track slot._id){
+                    <thead>
 
                         <tr>
 
-                            <td>
-                                {{ slot.date | date:'dd MMM yyyy' }}
-                            </td>
-
-                            <td>
-                                {{ slot.startTime }}
-                            </td>
-
-                            <td>
-                                {{ slot.endTime }}
-                            </td>
-
-                            <td>
-                                {{ slot.duration }} mins
-                            </td>
-
-                            <td>
-
-                                @if(slot.isActive){
-
-                                    <span class="badge active">
-                                        Active
-                                    </span>
-
-                                } @else {
-
-                                    <span class="badge inactive">
-                                        Inactive
-                                    </span>
-
-                                }
-
-                            </td>
-
-                            <td>
-
-                                <div class="actions">
-
-                                    <button
-                                        type="button"
-                                        class="icon-btn edit"
-                                        (click)="editSlot(slot)"
-                                        title="Edit Slot">
-
-                                        <i class="fa-solid fa-pen-to-square"></i>
-
-                                    </button>
-
-                                    <button
-                                        type="button"
-                                        class="icon-btn toggle"
-                                        (click)="confirmToggle(slot)"
-                                        [title]="slot.isActive ? 'Deactivate Slot' : 'Activate Slot'">
-
-                                        @if(slot.isActive){
-
-                                            <i class="fa-solid fa-toggle-on"></i>
-
-                                        } @else {
-
-                                            <i class="fa-solid fa-toggle-off"></i>
-
-                                        }
-
-                                    </button>
-
-                                </div>
-
-                            </td>
+                            <th>Date</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Duration</th>
+                            <th>Status</th>
+                            <th>Action</th>
 
                         </tr>
 
-                    }
+                    </thead>
 
-                </tbody>
+                    <tbody>
 
-            </table>
+                        @for(slot of filteredSlots; track slot._id){
+
+                            <tr>
+
+                                <td>
+                                    <div class="table-date">
+
+                                        <i class="fa-regular fa-calendar"></i>
+
+                                        {{ slot.date | date:'dd MMM yyyy' }}
+
+                                    </div>
+                                </td>
+
+                                <td>
+                                    {{ slot.startTime }}
+                                </td>
+
+                                <td>
+                                    {{ slot.endTime }}
+                                </td>
+
+                                <td>
+                                    <span class="duration-badge">
+                                        {{ slot.duration }} mins
+                                    </span>
+                                </td>
+
+                                <td>
+
+                                    @if(slot.isActive){
+
+                                        <span class="badge active">
+                                            Active
+                                        </span>
+
+                                    } @else {
+
+                                        <span class="badge inactive">
+                                            Inactive
+                                        </span>
+
+                                    }
+
+                                </td>
+
+                                <td>
+
+                                    <div class="actions">
+
+                                        <button
+                                            type="button"
+                                            class="icon-btn edit"
+                                            (click)="editSlot(slot)"
+                                            title="Edit Slot">
+
+                                            <i class="fa-solid fa-pen-to-square"></i>
+
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            class="icon-btn toggle"
+                                            (click)="confirmToggle(slot)"
+                                            [title]="slot.isActive ? 'Deactivate Slot' : 'Activate Slot'">
+
+                                            @if(slot.isActive){
+
+                                                <i class="fa-solid fa-toggle-on"></i>
+
+                                            } @else {
+
+                                                <i class="fa-solid fa-toggle-off"></i>
+
+                                            }
+
+                                        </button>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
 
         }
 

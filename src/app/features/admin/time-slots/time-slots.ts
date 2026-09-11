@@ -30,13 +30,47 @@ export class TimeSlots implements OnInit {
   filteredSlots: any[] = [];
 
   searchText = '';
-
   loading = false;
 
   activeSlots = 0;
   inactiveSlots = 0;
 
   selectedDates: string[] = [];
+
+  currentMonth = new Date().getMonth();
+  currentYear = new Date().getFullYear();
+
+  calendarDays: {
+    date: Date;
+    dateString: string;
+    isCurrentMonth: boolean;
+    isToday: boolean;
+  }[] = [];
+
+  monthNames = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ];
+
+  weekDays = [
+    'MON',
+    'TUE',
+    'WED',
+    'THU',
+    'FRI',
+    'SAT',
+    'SUN'
+  ];
 
   slotForm = this.fb.group({
     startTime: [
@@ -56,10 +90,11 @@ export class TimeSlots implements OnInit {
   });
 
   ngOnInit(): void {
+    this.generateCalendar();
     this.loadSlots();
   }
 
-  loadSlots() {
+  loadSlots(): void {
 
     this.loading = true;
 
@@ -82,7 +117,6 @@ export class TimeSlots implements OnInit {
           this.slots.filter(
             slot => !slot.isActive
           ).length;
-
       },
 
       error: (err) => {
@@ -90,42 +124,228 @@ export class TimeSlots implements OnInit {
         this.loading = false;
 
         console.error(err);
-
       }
 
     });
-
   }
 
-  onDateChange(event: Event) {
+  generateCalendar(): void {
 
-    const input =
-      event.target as HTMLInputElement;
+    const firstDay = new Date(
+      this.currentYear,
+      this.currentMonth,
+      1
+    );
 
-    const date = input.value;
+    const lastDay = new Date(
+      this.currentYear,
+      this.currentMonth + 1,
+      0
+    );
 
-    if (!date) {
+    let startDay = firstDay.getDay();
+
+    startDay = startDay === 0 ? 6 : startDay - 1;
+
+    const totalDays = lastDay.getDate();
+
+    const previousMonthLastDay = new Date(
+      this.currentYear,
+      this.currentMonth,
+      0
+    ).getDate();
+
+    this.calendarDays = [];
+
+    for (let i = startDay - 1; i >= 0; i--) {
+
+      const day = previousMonthLastDay - i;
+
+      const date = new Date(
+        this.currentYear,
+        this.currentMonth - 1,
+        day
+      );
+
+      this.calendarDays.push(
+        this.createCalendarDay(date, false)
+      );
+    }
+
+    for (let day = 1; day <= totalDays; day++) {
+
+      const date = new Date(
+        this.currentYear,
+        this.currentMonth,
+        day
+      );
+
+      this.calendarDays.push(
+        this.createCalendarDay(date, true)
+      );
+    }
+
+    let nextDay = 1;
+
+    while (this.calendarDays.length < 42) {
+
+      const date = new Date(
+        this.currentYear,
+        this.currentMonth + 1,
+        nextDay
+      );
+
+      this.calendarDays.push(
+        this.createCalendarDay(date, false)
+      );
+
+      nextDay++;
+    }
+  }
+
+  createCalendarDay(
+    date: Date,
+    isCurrentMonth: boolean
+  ) {
+
+    return {
+      date,
+      dateString: this.formatDate(date),
+      isCurrentMonth,
+      isToday: this.isToday(date)
+    };
+  }
+
+  previousMonth(): void {
+
+    this.currentMonth--;
+
+    if (this.currentMonth < 0) {
+
+      this.currentMonth = 11;
+      this.currentYear--;
+    }
+
+    this.generateCalendar();
+  }
+
+  nextMonth(): void {
+
+    this.currentMonth++;
+
+    if (this.currentMonth > 11) {
+
+      this.currentMonth = 0;
+      this.currentYear++;
+    }
+
+    this.generateCalendar();
+  }
+
+  goToToday(): void {
+
+    const today = new Date();
+
+    this.currentMonth = today.getMonth();
+    this.currentYear = today.getFullYear();
+
+    this.generateCalendar();
+  }
+
+  selectDate(dateString: string, isCurrentMonth: boolean): void {
+
+    if (!isCurrentMonth) {
       return;
     }
 
-    if (!this.selectedDates.includes(date)) {
-      this.selectedDates.push(date);
+    if (this.editingSlotId) {
+      return;
     }
 
-    input.value = '';
+    const index =
+      this.selectedDates.indexOf(dateString);
 
+    if (index === -1) {
+
+      this.selectedDates.push(dateString);
+
+    } else {
+
+      this.selectedDates.splice(index, 1);
+    }
+
+    this.selectedDates = [...this.selectedDates];
   }
 
-  removeDate(date: string) {
+  isDateSelected(dateString: string): boolean {
+
+    return this.selectedDates.includes(dateString);
+  }
+
+  isToday(date: Date): boolean {
+
+    const today = new Date();
+
+    return (
+      date.getFullYear() === today.getFullYear() &&
+      date.getMonth() === today.getMonth() &&
+      date.getDate() === today.getDate()
+    );
+  }
+
+  formatDate(date: Date): string {
+
+    const year =
+      date.getFullYear();
+
+    const month =
+      String(date.getMonth() + 1).padStart(2, '0');
+
+    const day =
+      String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  }
+
+  formatSelectedDate(date: string): string {
+
+    const parts = date.split('-');
+
+    if (parts.length !== 3) {
+      return date;
+    }
+
+    const selectedDate = new Date(
+      Number(parts[0]),
+      Number(parts[1]) - 1,
+      Number(parts[2])
+    );
+
+    return selectedDate.toLocaleDateString(
+      'en-GB',
+      {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      }
+    );
+  }
+
+  removeDate(date: string): void {
 
     this.selectedDates =
       this.selectedDates.filter(
-        d => d !== date
+        selectedDate =>
+          selectedDate !== date
       );
-
   }
 
-  editSlot(slot: any) {
+  clearSelectedDates(): void {
+
+    this.selectedDates = [];
+  }
+
+  editSlot(slot: any): void {
 
     this.editingSlotId = slot._id;
 
@@ -136,19 +356,27 @@ export class TimeSlots implements OnInit {
       endTime: slot.endTime,
 
       duration: slot.duration
-
     });
 
+    const slotDate =
+      this.formatDate(new Date(slot.date));
+
+    this.currentMonth =
+      new Date(slot.date).getMonth();
+
+    this.currentYear =
+      new Date(slot.date).getFullYear();
+
+    this.generateCalendar();
   }
 
-  saveSlot() {
+  saveSlot(): void {
 
     if (this.slotForm.invalid) {
 
       this.slotForm.markAllAsTouched();
 
       return;
-
     }
 
     const value =
@@ -170,7 +398,6 @@ export class TimeSlots implements OnInit {
       );
 
       return;
-
     }
 
     if (this.editingSlotId) {
@@ -180,12 +407,9 @@ export class TimeSlots implements OnInit {
         date:
           this.getEditingSlotDate(),
 
-        startTime:
-          startTime,
+        startTime,
 
-        duration:
-          duration
-
+        duration
       };
 
       this.slotService
@@ -204,7 +428,6 @@ export class TimeSlots implements OnInit {
             this.resetForm();
 
             this.loadSlots();
-
           },
 
           error: (err: any) => {
@@ -213,13 +436,11 @@ export class TimeSlots implements OnInit {
               err.error?.message ||
               'Unable to update slot.'
             );
-
           }
 
         });
 
       return;
-
     }
 
     if (this.selectedDates.length === 0) {
@@ -229,7 +450,6 @@ export class TimeSlots implements OnInit {
       );
 
       return;
-
     }
 
     const createData = {
@@ -237,15 +457,11 @@ export class TimeSlots implements OnInit {
       dates:
         this.selectedDates,
 
-      startTime:
-        startTime,
+      startTime,
 
-      endTime:
-        endTime,
+      endTime,
 
-      duration:
-        duration
-
+      duration
     };
 
     this.loading = true;
@@ -266,7 +482,6 @@ export class TimeSlots implements OnInit {
           this.resetForm();
 
           this.loadSlots();
-
         },
 
         error: (err: any) => {
@@ -277,11 +492,9 @@ export class TimeSlots implements OnInit {
             err.error?.message ||
             'Unable to create slots.'
           );
-
         }
 
       });
-
   }
 
   getEditingSlotDate(): string {
@@ -295,23 +508,12 @@ export class TimeSlots implements OnInit {
       return '';
     }
 
-    const date =
-      new Date(slot.date);
-
-    const year =
-      date.getFullYear();
-
-    const month =
-      String(date.getMonth() + 1).padStart(2, '0');
-
-    const day =
-      String(date.getDate()).padStart(2, '0');
-
-    return `${year}-${month}-${day}`;
-
+    return this.formatDate(
+      new Date(slot.date)
+    );
   }
 
-  searchSlots() {
+  searchSlots(): void {
 
     const keyword =
       this.searchText
@@ -331,12 +533,10 @@ export class TimeSlots implements OnInit {
           startTime.includes(keyword) ||
           endTime.includes(keyword)
         );
-
       });
-
   }
 
-  confirmToggle(slot: any) {
+  confirmToggle(slot: any): void {
 
     const action =
       slot.isActive
@@ -359,7 +559,6 @@ export class TimeSlots implements OnInit {
         next: () => {
 
           this.loadSlots();
-
         },
 
         error: (err: any) => {
@@ -368,14 +567,12 @@ export class TimeSlots implements OnInit {
             err.error?.message ||
             'Unable to update slot status.'
           );
-
         }
 
       });
-
   }
 
-  resetForm() {
+  resetForm(): void {
 
     this.slotForm.reset({
 
@@ -384,13 +581,12 @@ export class TimeSlots implements OnInit {
       endTime: '',
 
       duration: 15
-
     });
 
     this.selectedDates = [];
 
     this.editingSlotId = '';
 
+    this.goToToday();
   }
-
 }
